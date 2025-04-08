@@ -2,8 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ListItem } from './components';
 import useData from './useData';
 import useSort from './useSort';
+import { Item } from '../types';
 
-const SubTitle: React.FC<any> = ({children}) => (
+interface SubTitleProps {
+    children: React.ReactNode;
+  }
+
+const SubTitle: React.FC<SubTitleProps> = ({children}) => (
     <h2 className={'list-subtitle'}>Active Item ID: {children}</h2>
 )
 
@@ -11,13 +16,13 @@ function ListPage() {
     const items = useData();
     const [sortedItems, sortBy, handleSortClick] = useSort(items);
     
-    const [activeItemId,  setActiveItemId] = useState<any>(null);
-    const [filteredItems, setFilteredItems] = useState<any[]>([]);
+    const [activeItemId,  setActiveItemId] = useState<number | null>(null);
+    const [filteredItems, setFilteredItems] = useState<Item[]>([]);
     const [query, setQuery] = useState<string>('');
     
-    const activeItemText = useMemo(() => activeItemId ? activeItemId : 'Empty', []);
+    const activeItemText = useMemo(() => activeItemId !== null ? activeItemId : 'Empty', [activeItemId]);
     
-  const handleItemClick = (id: any) => {
+  const handleItemClick = (id: number) => {
     setActiveItemId(id);
   };
   
@@ -26,14 +31,9 @@ function ListPage() {
   }
     
     useEffect(() => {
-        setFilteredItems(sortedItems);
-    }, [sortedItems]);
-  
-    useEffect(() => {
-        if (query.length > 0) {
-            setFilteredItems(filteredItems.filter(item => `${item.id}`.includes(query.toLowerCase().trimStart().trimEnd().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))));
-        }
-    }, [query, filteredItems]);
+        const filtered = sortedItems.filter(item => `${item.id}`.includes(query))
+        setFilteredItems(filtered);
+    }, [sortedItems, query]);
 
   return (
     <div className={'list-wrapper'}>
@@ -46,10 +46,10 @@ function ListPage() {
         <div className="list-container">
             <div className="list">
                 {filteredItems.length === 0 && <span>Loading...</span>}
-                {filteredItems.map((item, index) => (
+                {filteredItems.map((item) => (
                     <ListItem
-                        key={index}
-                        isactive={activeItemId===item.id}
+                        key={item.id}
+                        isActive={activeItemId===item.id}
                         id={item.id}
                         name={item.name}
                         description={item.description}

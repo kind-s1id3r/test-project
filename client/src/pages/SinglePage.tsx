@@ -1,15 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-
-type ItemType = {
-  id: number;
-  name: string;
-  description: string;
-};
+import { Item } from '../types';
 
 function SinglePage() {
   const { id } = useParams();
-  const [item, setItem] = useState<ItemType | null>(null);
+  const [item, setItem] = useState<Item | null>(null);
 
   useEffect(() => {
     fetch(`${process.env.API_URL}/items/${id}`)
@@ -24,9 +19,16 @@ function SinglePage() {
     <div className="detail">
         <Link to={'/'}>Go Back</Link>
       <h2>Item Details</h2>
-      <p>ID: {item!.id}</p>
-      <p>Name: {item!.name}</p>
-      <p>Description: {item!.description}</p>
+      {
+        item ? 
+        <>
+          <p>ID: {item.id}</p>
+          <p>Name: {item.name}</p>
+          <p>Description: {item.description}</p>
+        </>
+        :
+        <span>Loading...</span>
+      }
     </div>
   );
 }

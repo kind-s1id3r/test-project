@@ -1,28 +1,25 @@
 import { useMemo, useState } from 'react';
 
-function useSort(items: any[]): [any[], any, any] {
-	const [sortBy, setSortBy] = useState('ASC');
+import { Item } from '../types';
+
+type SortOrder = 'ASC' | 'DESC';
+
+function useSort(items: Item[]): [Item[], SortOrder, () => void] {
+	const [sortBy, setSortBy] = useState<SortOrder>('ASC');
 	
 	const sortedItems = useMemo(() => {
-		if (sortBy === 'DESC') {
-			return items;
-		}
+		const sorted = [...items];
 		
 		if (sortBy === 'ASC') {
-			return items.sort((a, b) => b.id - a.id)
+			return sorted.sort((a, b) => a.id - b.id);
+		} else {
+			return sorted.sort((a, b) => b.id - a.id);
 		}
 		
-		return items;
 	}, [items, sortBy]);
 	
 	const handleSortClick = () => {
-		if (sortBy === 'ASC') {
-			setSortBy('DESC');
-		} else if (sortBy === 'DESC') {
-			setSortBy('ASC');
-		} else {
-			setSortBy('');
-		}
+		setSortBy((prevSortBy) => (prevSortBy === 'ASC' ? 'DESC' : 'ASC'));
 	}
 	
 	return [sortedItems, sortBy, handleSortClick]
